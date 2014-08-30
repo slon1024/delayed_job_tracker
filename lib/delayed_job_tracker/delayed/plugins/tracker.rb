@@ -17,13 +17,16 @@ module Delayed
       end
 
       def self.run_callback(name, worker, job)
-        if block = @@tracker_callbacks[name]
-          block.call(worker, job)
+        if callbacks = @@tracker_callbacks[name]
+          callbacks.each do |block|
+            block.call(worker, job)
+          end
         end
       end
 
       def self.register_callback(name, &block)
-        @@tracker_callbacks[name] = block
+        @@tracker_callbacks[name] = [] if @@tracker_callbacks[name].nil?
+        @@tracker_callbacks[name] << block
       end
     end
   end
